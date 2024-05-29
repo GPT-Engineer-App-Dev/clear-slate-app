@@ -50,7 +50,7 @@ Venue // table: venues
 
 export const useEvents = () => useQuery({
     queryKey: ['events'],
-    queryFn: () => fromSupabase(supabase.from('events').select('*')),
+    queryFn: () => fromSupabase(supabase.from('events').select('*').order('created_at', { ascending: false })),
 });
 
 export const useEvent = (eventId) => useQuery({
