@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Heading, VStack, Button, Input, Textarea, Box, Text, HStack } from '@chakra-ui/react';
+import { Link } from 'react-router-dom';
 import { useEvents, useAddEvent, useUpdateEvent, useDeleteEvent } from '../integrations/supabase';
 
 const EventPage = () => {
@@ -103,6 +104,7 @@ const EventPage = () => {
                 <HStack spacing={2} mt={2}>
                   <Button onClick={() => setEditingEvent(event)}>Edit</Button>
                   <Button colorScheme="red" onClick={() => handleDeleteEvent(event.id)}>Delete</Button>
+                  <Button as={Link} to={`/events/${event.id}`}>View Details</Button>
                 </HStack>
               </>
             )}
