@@ -63,6 +63,26 @@ export const useAddEvent = () => {
     });
 };
 
+export const useUpdateEvent = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (updatedEvent) => fromSupabase(supabase.from('events').update(updatedEvent).eq('id', updatedEvent.id)),
+        onSuccess: () => {
+            queryClient.invalidateQueries('events');
+        },
+    });
+};
+
+export const useDeleteEvent = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id) => fromSupabase(supabase.from('events').delete().eq('id', id)),
+        onSuccess: () => {
+            queryClient.invalidateQueries('events');
+        },
+    });
+};
+
 export const useComments = () => useQuery({
     queryKey: ['comments'],
     queryFn: () => fromSupabase(supabase.from('comments').select('*')),
