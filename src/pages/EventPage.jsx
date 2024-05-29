@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Heading, VStack, Button, Input, Textarea, Box, Text, HStack } from '@chakra-ui/react';
 import { useEvents, useAddEvent, useUpdateEvent, useDeleteEvent } from '../integrations/supabase';
 
@@ -13,7 +13,12 @@ const EventPage = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewEvent({ ...newEvent, [name]: value });
+    if (name === 'date') {
+      const formattedDate = new Date(value).toISOString().split('T')[0];
+      setNewEvent({ ...newEvent, [name]: formattedDate });
+    } else {
+      setNewEvent({ ...newEvent, [name]: value });
+    }
   };
 
   const handleAddEvent = () => {
@@ -44,6 +49,7 @@ const EventPage = () => {
           onChange={handleInputChange}
         />
         <Input
+          type="date"
           placeholder="Event Date"
           name="date"
           value={newEvent.date}
@@ -69,10 +75,14 @@ const EventPage = () => {
                   onChange={(e) => setEditingEvent({ ...editingEvent, name: e.target.value })}
                 />
                 <Input
+                  type="date"
                   placeholder="Event Date"
                   name="date"
                   value={editingEvent.date}
-                  onChange={(e) => setEditingEvent({ ...editingEvent, date: e.target.value })}
+                  onChange={(e) => {
+                    const formattedDate = new Date(e.target.value).toISOString().split('T')[0];
+                    setEditingEvent({ ...editingEvent, date: formattedDate });
+                  }}
                 />
                 <Textarea
                   placeholder="Event Description"
@@ -88,7 +98,7 @@ const EventPage = () => {
             ) : (
               <>
                 <Heading as="h3" size="md">{event.name}</Heading>
-                <Text>{event.date}</Text>
+                <Text>{new Date(event.date).toLocaleDateString()}</Text>
                 <Text>{event.description}</Text>
                 <HStack spacing={2} mt={2}>
                   <Button onClick={() => setEditingEvent(event)}>Edit</Button>
