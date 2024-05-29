@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { format } from 'date-fns';
 import { Container, Heading, VStack, Button, Input, Textarea, Box, Text, HStack } from '@chakra-ui/react';
 import { useEvents, useAddEvent, useUpdateEvent, useDeleteEvent } from '../integrations/supabase';
 
@@ -13,7 +14,11 @@ const EventPage = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewEvent({ ...newEvent, [name]: value });
+    if (name === 'date') {
+      setNewEvent({ ...newEvent, [name]: format(new Date(value), 'yyyy-MM-dd') });
+    } else {
+      setNewEvent({ ...newEvent, [name]: value });
+    }
   };
 
   const handleAddEvent = () => {
@@ -22,6 +27,9 @@ const EventPage = () => {
   };
 
   const handleUpdateEvent = (event) => {
+    if (event.date) {
+      event.date = format(new Date(event.date), 'yyyy-MM-dd');
+    }
     updateEvent.mutate(event);
     setEditingEvent(null);
   };
@@ -44,6 +52,7 @@ const EventPage = () => {
           onChange={handleInputChange}
         />
         <Input
+          type="date"
           placeholder="Event Date"
           name="date"
           value={newEvent.date}
@@ -69,10 +78,11 @@ const EventPage = () => {
                   onChange={(e) => setEditingEvent({ ...editingEvent, name: e.target.value })}
                 />
                 <Input
+                  type="date"
                   placeholder="Event Date"
                   name="date"
                   value={editingEvent.date}
-                  onChange={(e) => setEditingEvent({ ...editingEvent, date: e.target.value })}
+                  onChange={(e) => setEditingEvent({ ...editingEvent, date: format(new Date(e.target.value), 'yyyy-MM-dd') })}
                 />
                 <Textarea
                   placeholder="Event Description"
