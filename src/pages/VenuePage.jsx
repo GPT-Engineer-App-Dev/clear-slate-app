@@ -3,10 +3,17 @@ import { Container, Heading, VStack, Button, Input, Textarea, Box, Text, HStack 
 import { useVenues, useAddVenue, useUpdateVenue, useDeleteVenue } from '../integrations/supabase';
 
 const VenuePage = () => {
-  const { data: venues, isLoading, isError } = useVenues();
+  const { data: fetchedVenues, isLoading, isError } = useVenues();
+  const [venues, setVenues] = useState([]);
   const addVenue = useAddVenue();
   const updateVenue = useUpdateVenue();
   const deleteVenue = useDeleteVenue();
+
+  useEffect(() => {
+    if (fetchedVenues) {
+      setVenues(fetchedVenues);
+    }
+  }, [fetchedVenues]);
 
   const [newVenue, setNewVenue] = useState({ name: '', location: '', description: '' });
   const [editingVenue, setEditingVenue] = useState(null);

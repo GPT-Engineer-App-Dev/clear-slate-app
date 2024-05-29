@@ -5,13 +5,20 @@ import { useEvents, useAddEvent, useUpdateEvent, useDeleteEvent, useVenues } fro
 
 const EventPage = () => {
   const { data: events, isLoading, isError } = useEvents();
-  const { data: venues } = useVenues();
+  const { data: venuesData } = useVenues();
   const addEvent = useAddEvent();
   const updateEvent = useUpdateEvent();
   const deleteEvent = useDeleteEvent();
 
   const [newEvent, setNewEvent] = useState({ name: '', date: '', description: '', venue_id: '' });
   const [editingEvent, setEditingEvent] = useState(null);
+  const [venues, setVenues] = useState([]);
+
+  useEffect(() => {
+    if (venuesData) {
+      setVenues(venuesData);
+    }
+  }, [venuesData]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -122,6 +129,7 @@ const EventPage = () => {
                 <Heading as="h3" size="md">{event.name}</Heading>
                 <Text>{new Date(event.date).toLocaleDateString()}</Text>
                 <Text>{event.description}</Text>
+                <Text>{venues.find(venue => venue.id === event.venue_id)?.name}</Text>
                 <HStack spacing={2} mt={2}>
                   <Button onClick={() => setEditingEvent(event)}>Edit</Button>
                   <Button colorScheme="red" onClick={() => handleDeleteEvent(event.id)}>Delete</Button>
