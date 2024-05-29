@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Heading, VStack, Button, Input, Textarea, Box, Text, HStack } from '@chakra-ui/react';
+import { Container, Heading, VStack, Button, Input, Textarea, Box, Text, HStack, Select } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
-import { useEvents, useAddEvent, useUpdateEvent, useDeleteEvent } from '../integrations/supabase';
+import { useEvents, useAddEvent, useUpdateEvent, useDeleteEvent, useVenues } from '../integrations/supabase';
 
 const EventPage = () => {
   const { data: events, isLoading, isError } = useEvents();
+  const { data: venues, isLoading: venuesLoading, isError: venuesError } = useVenues();
   const addEvent = useAddEvent();
   const updateEvent = useUpdateEvent();
   const deleteEvent = useDeleteEvent();
 
   const [newEvent, setNewEvent] = useState({ name: '', date: '', description: '' });
   const [editingEvent, setEditingEvent] = useState(null);
+  const [selectedVenue, setSelectedVenue] = useState('');
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -23,8 +25,9 @@ const EventPage = () => {
   };
 
   const handleAddEvent = () => {
-    addEvent.mutate(newEvent);
+    addEvent.mutate({ ...newEvent, venue_id: selectedVenue });
     setNewEvent({ name: '', date: '', description: '' });
+    setSelectedVenue('');
   };
 
   const handleUpdateEvent = (event) => {
@@ -36,8 +39,10 @@ const EventPage = () => {
     deleteEvent.mutate(id);
   };
 
-  if (isLoading) return <Text>Loading...</Text>;
+  if (isLoading) return <Text>Loading events...</Text>;
   if (isError) return <Text>Error loading events</Text>;
+  if (venuesLoading) return <Text>Loading venues...</Text>;
+  if (venuesError) return <Text>Error loading venues</Text>;
 
   return (
     <Container maxW="container.md" py={8}>
@@ -62,6 +67,11 @@ const EventPage = () => {
           value={newEvent.description}
           onChange={handleInputChange}
         />
+        <Select placeholder="Select Venue" value={selectedVenue} onChange={(e) => setSelectedVenue(e.target.value)}>
+          {venues.map((venue) => (
+            <option key={venue.id} value={venue.id}>{venue.name}</option>
+          ))}
+        </Select>
         <Button colorScheme="teal" onClick={handleAddEvent}>Add Event</Button>
       </VStack>
       <VStack spacing={4}>
