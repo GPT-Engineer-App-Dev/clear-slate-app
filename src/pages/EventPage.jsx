@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Heading, VStack, Button, Input, Textarea, Box, Text, HStack } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
-import { useEvents, useAddEvent, useUpdateEvent, useDeleteEvent } from '../integrations/supabase';
+import { useEvents, useAddEvent, useUpdateEvent, useDeleteEvent, useVenues } from '../integrations/supabase';
 
 const EventPage = () => {
   const { data: events, isLoading, isError } = useEvents();
+  const { data: venues } = useVenues();
   const addEvent = useAddEvent();
   const updateEvent = useUpdateEvent();
   const deleteEvent = useDeleteEvent();
 
-  const [newEvent, setNewEvent] = useState({ name: '', date: '', description: '' });
+  const [newEvent, setNewEvent] = useState({ name: '', date: '', description: '', venue_id: '' });
   const [editingEvent, setEditingEvent] = useState(null);
 
   const handleInputChange = (e) => {
@@ -24,7 +25,7 @@ const EventPage = () => {
 
   const handleAddEvent = () => {
     addEvent.mutate(newEvent);
-    setNewEvent({ name: '', date: '', description: '' });
+    setNewEvent({ name: '', date: '', description: '', venue_id: '' });
   };
 
   const handleUpdateEvent = (event) => {
@@ -62,6 +63,16 @@ const EventPage = () => {
           value={newEvent.description}
           onChange={handleInputChange}
         />
+        <select
+          name="venue_id"
+          value={newEvent.venue_id}
+          onChange={handleInputChange}
+        >
+          <option value="">Select Venue</option>
+          {venues.map((venue) => (
+            <option key={venue.id} value={venue.id}>{venue.name}</option>
+          ))}
+        </select>
         <Button colorScheme="teal" onClick={handleAddEvent}>Add Event</Button>
       </VStack>
       <VStack spacing={4}>
@@ -91,6 +102,16 @@ const EventPage = () => {
                   value={editingEvent.description}
                   onChange={(e) => setEditingEvent({ ...editingEvent, description: e.target.value })}
                 />
+                <select
+                  name="venue_id"
+                  value={editingEvent.venue_id}
+                  onChange={(e) => setEditingEvent({ ...editingEvent, venue_id: e.target.value })}
+                >
+                  <option value="">Select Venue</option>
+                  {venues.map((venue) => (
+                    <option key={venue.id} value={venue.id}>{venue.name}</option>
+                  ))}
+                </select>
                 <HStack spacing={2} mt={2}>
                   <Button colorScheme="teal" onClick={() => handleUpdateEvent(editingEvent)}>Save</Button>
                   <Button onClick={() => setEditingEvent(null)}>Cancel</Button>
